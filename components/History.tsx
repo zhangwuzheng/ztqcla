@@ -13,11 +13,20 @@ export const History: React.FC<HistoryProps> = ({ batches, onClear }) => {
     if (batches.length === 0) return;
     
     // Header
-    let csvContent = "\ufeff日期,规格,详情,总根数,那曲发货总价,藏境发货总价,建议零售总价\n";
+    let csvContent = "\ufeff日期,规格,规格(根/克),装瓶数量(根),瓶数(瓶),瓶型,盒型,包装辅助标志,详情描述,电商规格,总根数,那曲发货,藏境发货,建议零售\n";
     
     batches.forEach(batch => {
       batch.items.forEach(item => {
-        csvContent += `${batch.date},${item.specName},"${item.details}",${item.totalRoots},${item.totalNagquPrice},${item.totalChannelPrice},${item.totalRetail}\n`;
+        // Handle potential undefined fields for old data compatibility
+        const rootsPerGram = item.rootsPerGram || '-';
+        const rootsPerBottle = item.rootsPerBottle || 0;
+        const bottleCount = item.bottleCount || 0;
+        const bottleType = item.bottleType || '-';
+        const boxType = item.boxType || '-';
+        const packagingColor = item.packagingColor || '-';
+        const ecommerceSpec = item.ecommerceSpec ? `"${item.ecommerceSpec.replace(/"/g, '""')}"` : '-';
+
+        csvContent += `${batch.date},${item.specName},${rootsPerGram},${rootsPerBottle},${bottleCount},${bottleType},${boxType},${packagingColor},"${item.details}",${ecommerceSpec},${item.totalRoots},${item.totalNagquPrice},${item.totalChannelPrice},${item.totalRetail}\n`;
       });
     });
 

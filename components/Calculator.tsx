@@ -101,6 +101,13 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
 
   const avgRootsPerGram = (spec.rootsPerGramMin + spec.rootsPerGramMax) / 2;
 
+  // Determine packaging color based on roots per jin
+  const recoColor = spec.rootsPerJin <= 1500 
+    ? PACKAGING_COLORS.gold 
+    : spec.rootsPerJin <= 2200 
+      ? PACKAGING_COLORS.green 
+      : PACKAGING_COLORS.red;
+
   // Calculation
   let calculated = {
     totalRoots: 0,
@@ -164,9 +171,45 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
   };
 
   const handleAdd = () => {
+    let rootsPerBottleVal = 0;
+    let totalBottlesVal = 0;
+    let bottleTypeVal = '-';
+    let boxTypeVal = '-';
+    
+    if (mode === 'bottle') {
+       const isSmallBottle = packageType.startsWith('small');
+       rootsPerBottleVal = isSmallBottle ? bottleRule.smallBottleCount : bottleRule.mediumBottleCount;
+       totalBottlesVal = quantity * boxConfig;
+       
+       if (packageType === 'medium') {
+         bottleTypeVal = '中瓶';
+       } else {
+         bottleTypeVal = '小瓶';
+       }
+
+       if (boxConfig === 1) {
+         boxTypeVal = '散装';
+       } else if (packageType === 'small-small') {
+         boxTypeVal = '小包装';
+       } else if (packageType === 'small-large') {
+         boxTypeVal = '大包装';
+       } else {
+         boxTypeVal = '普通盒装';
+       }
+    } else {
+      boxTypeVal = '礼盒';
+    }
+
     onAddItem({
       id: Math.random().toString(36).substr(2, 9),
       specName: spec.name,
+      rootsPerGram: rootsPerGramText,
+      rootsPerBottle: rootsPerBottleVal,
+      bottleCount: totalBottlesVal,
+      bottleType: bottleTypeVal,
+      boxType: boxTypeVal,
+      packagingColor: recoColor.name,
+      ecommerceSpec: ecommerceSpec,
       type: mode,
       details: calculated.description,
       totalRoots: calculated.totalRoots,
@@ -200,13 +243,6 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
       img: IMAGES.medium
     },
   ];
-
-  // Determine packaging color based on roots per jin
-  const recoColor = spec.rootsPerJin <= 1500 
-    ? PACKAGING_COLORS.gold 
-    : spec.rootsPerJin <= 2200 
-      ? PACKAGING_COLORS.green 
-      : PACKAGING_COLORS.red;
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">

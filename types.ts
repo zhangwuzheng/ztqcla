@@ -24,6 +24,15 @@ export interface BottleRule {
 export interface ProductionItem {
   id: string;
   specName: string;
+  // New fields for detailed history
+  rootsPerGram: string;
+  rootsPerBottle: number;
+  bottleCount: number;
+  bottleType: string;
+  boxType: string;
+  packagingColor: string;
+  ecommerceSpec: string;
+  
   type: 'bottle' | 'box';
   details: string; // e.g., "Small Bottle (5 roots) x 10 bottles"
   totalRoots: number;
