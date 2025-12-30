@@ -1,0 +1,45 @@
+export type SpecId = string;
+
+export interface ProductSpec {
+  id: SpecId;
+  name: string; // e.g., "900", "1400-1500"
+  rootsPerJin: number; // Approximate numeric value for sorting/calc
+  rootsPerGram: number;
+  costPrice: number; // 那曲成本价
+  channelPrice: number; // 藏境发货价
+  minSalesPrice: number; // 最低销售限价
+  retailPrice: number; // 建议零售价
+}
+
+export interface BottleRule {
+  specId: SpecId;
+  smallBottleCount: number; // Roots per small bottle
+  mediumBottleCount: number; // Roots per medium bottle
+  smallBottlesPerBox: number[]; // e.g., [8, 10]
+  mediumBottlesPerBox: number[]; // e.g., [5]
+}
+
+export interface ProductionItem {
+  id: string;
+  specName: string;
+  type: 'bottle' | 'box';
+  details: string; // e.g., "Small Bottle (5 roots) x 10 bottles"
+  totalRoots: number;
+  totalCost: number;
+  totalRetail: number;
+  timestamp: number;
+}
+
+export interface Batch {
+  id: string;
+  date: string;
+  items: ProductionItem[];
+  totalCost: number;
+  totalRetail: number;
+  itemCount: number;
+}
+
+export interface AppData {
+  specs: ProductSpec[];
+  bottleRules: BottleRule[];
+}
