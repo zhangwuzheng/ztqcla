@@ -13,22 +13,14 @@ export const INITIAL_DATA: AppData = {
     { id: '2500-3000', name: '2500-3000', rootsPerJin: 2750, rootsPerGramMin: 5.0, rootsPerGramMax: 6.0, nagquPrice: 26, channelPrice: 39, minSalesPrice: 48, retailPrice: 60 },
   ],
   bottleRules: [
-    { specId: '900', smallBottleCount: 5, mediumBottleCount: 12, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '1000', smallBottleCount: 5, mediumBottleCount: 12, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] }, 
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '1200', smallBottleCount: 5, mediumBottleCount: 15, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '1400', smallBottleCount: 5, mediumBottleCount: 15, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '1500', smallBottleCount: 5, mediumBottleCount: 15, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '1600-1800', smallBottleCount: 6, mediumBottleCount: 15, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '2000-2200', smallBottleCount: 8, mediumBottleCount: 20, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '2200-2500', smallBottleCount: 8, mediumBottleCount: 20, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
-    // Fixed: removed 'id' property as it is not present in the BottleRule interface
-    { specId: '2500-3000', smallBottleCount: 8, mediumBottleCount: 20, smallBottlesPerBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '900', smallBottleCount: 5, mediumBottleCount: 12, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '1000', smallBottleCount: 5, mediumBottleCount: 12, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] }, 
+    { specId: '1200', smallBottleCount: 5, mediumBottleCount: 15, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '1400', smallBottleCount: 5, mediumBottleCount: 15, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '1500', smallBottleCount: 5, mediumBottleCount: 15, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '1600-1800', smallBottleCount: 6, mediumBottleCount: 15, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '2000-2200', smallBottleCount: 8, mediumBottleCount: 20, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '2200-2500', smallBottleCount: 8, mediumBottleCount: 20, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
+    { specId: '2500-3000', smallBottleCount: 8, mediumBottleCount: 20, smallBottlesSmallBox: [2, 3, 4], smallBottlesLargeBox: [8, 10], mediumBottlesPerBox: [2, 3, 4, 5] },
   ]
 };

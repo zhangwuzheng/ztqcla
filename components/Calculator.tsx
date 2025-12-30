@@ -6,12 +6,57 @@ interface CalculatorProps {
   onAddItem: (item: ProductionItem) => void;
 }
 
+type PackageType = 'small-small' | 'small-large' | 'medium';
+
+const IMAGES = {
+  smallSmall: "https://img.lenyiin.com/app/hide.php?key=Sk0xQmpKK25rUnFjeVFUdmRpNWFkVTVncmc1Q1ZhZkZPR2c4dUg0PQ==",
+  smallLarge: "https://img.lenyiin.com/app/hide.php?key=SkdQT1c1eG15ZU9qM2ZDS08zMWphVTVncmc1Q1ZhZkZPR2c4dUg1S3R3PT0=",
+  medium: "https://img.lenyiin.com/app/hide.php?key=V1lIdWhxaHl3L29BRFZrbHN1ZEpPVTVncmc1Q1ZhZkZPR2c4dUg0PQ==",
+  box: "https://img.lenyiin.com/app/hide.php?key=R3YwWURBK0ptd2VQQXNENEIrOWo3VTVncmc1Q1ZhZkZPR2c4dUg1S3R3PT0="
+};
+
+const PACKAGING_COLORS = {
+  gold: {
+    id: 'gold',
+    name: '帝王金',
+    range: '900-1500规格',
+    desc: '高端奢华 · 尊贵首选',
+    img: "https://img.lenyiin.com/app/hide.php?key=UDYyVkpiaUI2R2dGTXFDbzhzcG1yRTVncmc1Q1ZhZkZPR2c4dUg1S3R3PT0=",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-900",
+    badge: "bg-amber-100 text-amber-700"
+  },
+  green: {
+    id: 'green',
+    name: '松石绿',
+    range: '1600-2200规格',
+    desc: '清新典雅 · 自然纯粹',
+    img: "https://img.lenyiin.com/app/hide.php?key=bGd2aHZDaWhTVnFLVXlpRjZpVE9KMDVncmc1Q1ZhZkZPR2c4dUg0PQ==",
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-900",
+    badge: "bg-emerald-100 text-emerald-700"
+  },
+  red: {
+    id: 'red',
+    name: '朱砂红',
+    range: '2200-3000规格',
+    desc: '喜庆吉祥 · 礼赠佳品',
+    img: "https://img.lenyiin.com/app/hide.php?key=QzhRdEE3cmVGMFBHRVo1cFlRMmczMDVncmc1Q1ZhZkZPR2c4dUg1S3R3PT0=",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-900",
+    badge: "bg-red-100 text-red-700"
+  }
+};
+
 export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
   const [selectedSpecId, setSelectedSpecId] = useState<string>(data.specs[0]?.id || '');
   const [mode, setMode] = useState<'bottle' | 'box'>('bottle');
   
   // Bottle Mode State
-  const [bottleSize, setBottleSize] = useState<'small' | 'medium'>('small');
+  const [packageType, setPackageType] = useState<PackageType>('small-small');
   const [boxConfig, setBoxConfig] = useState<number>(0); 
   const [quantity, setQuantity] = useState<number>(1);
   
@@ -19,20 +64,31 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
   const [gramWeight, setGramWeight] = useState<number>(50);
   const [customGram, setCustomGram] = useState<string>('');
 
+  // UI State for copy feedback
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+
   // Derived State
   const spec = data.specs.find(s => s.id === selectedSpecId);
   const bottleRule = data.bottleRules.find(r => r.specId === selectedSpecId);
 
   useEffect(() => {
     if (bottleRule && mode === 'bottle') {
-      const options = bottleSize === 'small' ? bottleRule.smallBottlesPerBox : bottleRule.mediumBottlesPerBox;
+      let options: number[] = [];
+      if (packageType === 'small-small') {
+        options = bottleRule.smallBottlesSmallBox;
+      } else if (packageType === 'small-large') {
+        options = bottleRule.smallBottlesLargeBox;
+      } else {
+        options = bottleRule.mediumBottlesPerBox;
+      }
+
       if (options && options.length > 0) {
         setBoxConfig(options[0]);
       } else {
         setBoxConfig(1);
       }
     }
-  }, [selectedSpecId, bottleSize, mode, bottleRule]);
+  }, [selectedSpecId, packageType, mode, bottleRule]);
 
   if (!spec || !bottleRule) return <div className="p-8 text-center text-stone-500">正在加载数据...</div>;
 
@@ -55,7 +111,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
   };
 
   if (mode === 'bottle') {
-    const rootsPerBottle = bottleSize === 'small' ? bottleRule.smallBottleCount : bottleRule.mediumBottleCount;
+    const isSmallBottle = packageType.startsWith('small');
+    const rootsPerBottle = isSmallBottle ? bottleRule.smallBottleCount : bottleRule.mediumBottleCount;
     const bottlesPerUnit = boxConfig; 
     const totalBottles = quantity * bottlesPerUnit;
     
@@ -64,8 +121,13 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
     calculated.totalChannelPrice = calculated.totalRoots * spec.channelPrice;
     calculated.totalRetail = calculated.totalRoots * spec.retailPrice;
     
+    let typeName = '';
+    if (packageType === 'small-small') typeName = '小瓶小包装';
+    if (packageType === 'small-large') typeName = '小瓶大包装';
+    if (packageType === 'medium') typeName = '中瓶';
+
     const boxText = boxConfig > 1 ? `(共${quantity}盒, 每盒${boxConfig}瓶)` : `(${quantity}瓶散装)`;
-    calculated.description = `规格:${spec.name}(${rootsPerGramText}根/克) - ${bottleSize === 'small' ? '小瓶' : '中瓶'} (${rootsPerBottle}根/瓶) x ${totalBottles}瓶 ${boxText} [总根数:${calculated.totalRoots}]`;
+    calculated.description = `规格:${spec.name}(${rootsPerGramText}根/克) - ${typeName} (${rootsPerBottle}根/瓶) x ${totalBottles}瓶 ${boxText} [总根数:${calculated.totalRoots}]`;
   } else {
     const rootsPerBox = Math.round(currentWeight * avgRootsPerGram);
     calculated.totalRoots = rootsPerBox * quantity;
@@ -74,6 +136,32 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
     calculated.totalRetail = calculated.totalRoots * spec.retailPrice;
     calculated.description = `规格:${spec.name}(${rootsPerGramText}根/克) - ${currentWeight}克礼盒 (约${rootsPerBox}根) x ${quantity}盒 [总根数:${calculated.totalRoots}]`;
   }
+
+  // E-commerce Content Generation
+  const ecommerceTitle = `藏境扎塔奇-那曲野生冬虫夏草约${avgRootsPerGram.toFixed(1)}根/g约${calculated.totalRoots}根高端虫草礼盒营养品生日寿礼送人`;
+  
+  let ecommerceSpec = '';
+  if (mode === 'bottle') {
+     let typeName = '';
+     if (packageType === 'small-small') typeName = '小瓶小包装';
+     if (packageType === 'small-large') typeName = '小瓶大包装';
+     if (packageType === 'medium') typeName = '中瓶';
+     
+     const isSmallBottle = packageType.startsWith('small');
+     const rootsPerBottle = isSmallBottle ? bottleRule.smallBottleCount : bottleRule.mediumBottleCount;
+     const totalBottles = quantity * boxConfig;
+
+     ecommerceSpec = `${spec.name}规格(${rootsPerGramText}根/克) ${typeName} (${rootsPerBottle}根/瓶)x${totalBottles}瓶`;
+  } else {
+     ecommerceSpec = `${spec.name}规格(${rootsPerGramText}根/克) 礼盒装 (${currentWeight}克/盒)x${quantity}盒`;
+  }
+
+  const handleCopy = (text: string, type: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopyFeedback(type);
+      setTimeout(() => setCopyFeedback(null), 2000);
+    });
+  };
 
   const handleAdd = () => {
     onAddItem({
@@ -88,6 +176,37 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
       timestamp: Date.now(),
     });
   };
+
+  const bottleOptions = [
+    { 
+      id: 'small-small' as const, 
+      label: '小瓶 (小包装)', 
+      sub: '2-4瓶/盒',
+      count: bottleRule.smallBottleCount,
+      img: IMAGES.smallSmall
+    },
+    { 
+      id: 'small-large' as const, 
+      label: '小瓶 (大包装)', 
+      sub: '8-10瓶/盒',
+      count: bottleRule.smallBottleCount,
+      img: IMAGES.smallLarge
+    },
+    { 
+      id: 'medium' as const, 
+      label: '中瓶', 
+      sub: '2-5瓶/盒',
+      count: bottleRule.mediumBottleCount,
+      img: IMAGES.medium
+    },
+  ];
+
+  // Determine packaging color based on roots per jin
+  const recoColor = spec.rootsPerJin <= 1500 
+    ? PACKAGING_COLORS.gold 
+    : spec.rootsPerJin <= 2200 
+      ? PACKAGING_COLORS.green 
+      : PACKAGING_COLORS.red;
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
@@ -156,30 +275,28 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
             {mode === 'bottle' ? (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-stone-500 mb-2 uppercase tracking-wide">瓶型选择</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setBottleSize('small')}
-                      className={`p-4 border rounded-xl text-left transition-all ${
-                        bottleSize === 'small' 
-                          ? 'border-accent-500 bg-accent-100/10 ring-1 ring-accent-500' 
-                          : 'border-stone-200 hover:border-stone-300'
-                      }`}
-                    >
-                      <div className="font-bold text-brand-900">小瓶</div>
-                      <div className="text-xs text-stone-500 mt-1">{bottleRule.smallBottleCount} 根/瓶</div>
-                    </button>
-                    <button
-                      onClick={() => setBottleSize('medium')}
-                      className={`p-4 border rounded-xl text-left transition-all ${
-                        bottleSize === 'medium' 
-                          ? 'border-accent-500 bg-accent-100/10 ring-1 ring-accent-500' 
-                          : 'border-stone-200 hover:border-stone-300'
-                      }`}
-                    >
-                      <div className="font-bold text-brand-900">中瓶</div>
-                      <div className="text-xs text-stone-500 mt-1">{bottleRule.mediumBottleCount} 根/瓶</div>
-                    </button>
+                  <label className="block text-sm font-medium text-stone-500 mb-2 uppercase tracking-wide">瓶型包装</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {bottleOptions.map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setPackageType(opt.id)}
+                        className={`relative p-2 border rounded-xl flex flex-col items-center gap-2 text-center transition-all overflow-hidden ${
+                          packageType === opt.id 
+                            ? 'border-accent-500 bg-accent-50/50 ring-1 ring-accent-500' 
+                            : 'border-stone-200 hover:border-stone-300'
+                        }`}
+                      >
+                         <div className="w-full aspect-[4/3] rounded-lg overflow-hidden bg-stone-100 mb-1">
+                           <img src={opt.img} alt={opt.label} className="w-full h-full object-cover" />
+                         </div>
+                         <div className="px-1 pb-1">
+                            <div className="font-bold text-brand-900 text-sm leading-tight">{opt.label}</div>
+                            <div className="text-[10px] text-stone-500 mt-1">{opt.sub}</div>
+                            <div className="text-[10px] text-accent-600 font-medium mt-0.5">{opt.count} 根/瓶</div>
+                         </div>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -190,7 +307,13 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
                     onChange={(e) => setBoxConfig(Number(e.target.value))}
                     className="block w-full rounded-xl border-stone-300 bg-stone-50 py-3 px-4 shadow-sm focus:border-accent-500 focus:ring-accent-500 text-brand-900"
                   >
-                    {(bottleSize === 'small' ? bottleRule.smallBottlesPerBox : bottleRule.mediumBottlesPerBox).map(num => (
+                    {packageType === 'small-small' && bottleRule.smallBottlesSmallBox.map(num => (
+                      <option key={num} value={num}>{num} 瓶 / 盒</option>
+                    ))}
+                    {packageType === 'small-large' && bottleRule.smallBottlesLargeBox.map(num => (
+                      <option key={num} value={num}>{num} 瓶 / 盒</option>
+                    ))}
+                    {packageType === 'medium' && bottleRule.mediumBottlesPerBox.map(num => (
                       <option key={num} value={num}>{num} 瓶 / 盒</option>
                     ))}
                     <option value={1}>散装单瓶</option>
@@ -199,6 +322,13 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
               </div>
             ) : (
               <div className="space-y-6">
+                <div>
+                   <label className="block text-sm font-medium text-stone-500 mb-2 uppercase tracking-wide">礼盒预览</label>
+                   <div className="w-full aspect-[21/9] rounded-xl overflow-hidden bg-stone-100 mb-4 border border-stone-200">
+                      <img src={IMAGES.box} alt="礼盒包装" className="w-full h-full object-cover" />
+                   </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-stone-500 mb-2 uppercase tracking-wide">每盒克重</label>
                   <div className="grid grid-cols-3 gap-3">
@@ -282,8 +412,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
       </div>
 
       {/* Right Panel: Summary */}
-      <div className="xl:col-span-1">
-        <div className="bg-brand-900 rounded-2xl shadow-xl overflow-hidden sticky top-24 border border-brand-800 text-stone-100">
+      <div className="xl:col-span-1 space-y-6">
+        <div className="bg-brand-900 rounded-2xl shadow-xl overflow-hidden border border-brand-800 text-stone-100">
           <div className="px-6 py-5 border-b border-brand-800 flex justify-between items-center bg-black/20">
             <h3 className="text-lg font-bold text-white">费用预估</h3>
             <span className="text-xs font-medium bg-brand-800 text-accent-500 px-2 py-1 rounded border border-brand-700">{spec.name}</span>
@@ -321,6 +451,66 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
               加入待办列表
             </button>
           </div>
+        </div>
+
+        {/* Packaging Color Recommendation - Only for Bottle Mode */}
+        {mode === 'bottle' && (
+          <div className={`rounded-2xl shadow-sm border overflow-hidden ${recoColor.bg} ${recoColor.border}`}>
+             <div className={`px-6 py-4 border-b flex justify-between items-center ${recoColor.border} bg-white/50`}>
+                <h3 className={`text-base font-bold ${recoColor.text}`}>包装辅助标志推荐</h3>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${recoColor.badge}`}>
+                   {recoColor.name}
+                </span>
+             </div>
+             <div className="p-4 flex gap-4 items-center">
+                <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-black/5 bg-white">
+                   <img src={recoColor.img} alt={recoColor.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 space-y-1">
+                   <div className={`font-bold text-sm ${recoColor.text}`}>{recoColor.range}</div>
+                   <div className="text-xs text-stone-500">{recoColor.desc}</div>
+                   <div className="text-[10px] text-stone-400 mt-1">适用于小瓶包装系列</div>
+                </div>
+             </div>
+          </div>
+        )}
+
+        {/* E-commerce Content Generator */}
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+           <div className="px-6 py-4 border-b border-stone-200 bg-stone-50">
+              <h3 className="text-base font-bold text-brand-900">推荐电商内容</h3>
+           </div>
+           <div className="p-6 space-y-5">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                   <label className="text-xs font-bold text-stone-500 uppercase">商品标题</label>
+                   <button 
+                      onClick={() => handleCopy(ecommerceTitle, 'title')}
+                      className="text-xs text-accent-600 hover:text-accent-700 font-medium"
+                   >
+                     {copyFeedback === 'title' ? '已复制!' : '复制'}
+                   </button>
+                </div>
+                <div className="bg-stone-50 p-3 rounded-lg text-sm text-stone-700 break-all leading-relaxed border border-stone-200">
+                   {ecommerceTitle}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                   <label className="text-xs font-bold text-stone-500 uppercase">规格名称</label>
+                   <button 
+                      onClick={() => handleCopy(ecommerceSpec, 'spec')}
+                      className="text-xs text-accent-600 hover:text-accent-700 font-medium"
+                   >
+                     {copyFeedback === 'spec' ? '已复制!' : '复制'}
+                   </button>
+                </div>
+                <div className="bg-stone-50 p-3 rounded-lg text-sm text-stone-700 break-all leading-relaxed border border-stone-200">
+                   {ecommerceSpec}
+                </div>
+              </div>
+           </div>
         </div>
       </div>
     </div>

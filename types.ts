@@ -16,7 +16,8 @@ export interface BottleRule {
   specId: SpecId;
   smallBottleCount: number; // Roots per small bottle
   mediumBottleCount: number; // Roots per medium bottle
-  smallBottlesPerBox: number[]; // e.g., [8, 10]
+  smallBottlesSmallBox: number[]; // e.g. [2, 3, 4]
+  smallBottlesLargeBox: number[]; // e.g. [8, 10]
   mediumBottlesPerBox: number[]; // e.g., [2, 3, 4, 5]
 }
 
