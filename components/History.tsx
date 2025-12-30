@@ -111,31 +111,64 @@ export const History: React.FC<HistoryProps> = ({ batches, onClear }) => {
             {expandedId === batch.id && (
               <div className="border-t border-stone-200">
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-stone-100 text-sm">
+                  <table className="min-w-full divide-y divide-stone-100 text-sm whitespace-nowrap">
                     <thead className="bg-stone-50/50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase">规格</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase">详情描述</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase">那曲发货</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase">藏境发货</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-stone-500 uppercase">建议零售</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase">规格</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase">根/克</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase">包装类型</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase">装瓶(根)/瓶数</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase">标志</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase">详情/电商规格</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-stone-500 uppercase">那曲价</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-stone-500 uppercase">藏境价</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-stone-500 uppercase">建议零售</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-stone-100 bg-white">
                       {batch.items.map(item => (
                         <tr key={item.id} className="hover:bg-stone-50 transition-colors">
-                          <td className="px-6 py-3 font-bold text-brand-900">{item.specName}</td>
-                          <td className="px-6 py-3 text-stone-600 text-xs">{item.details}</td>
-                          <td className="px-6 py-3 text-right text-stone-400 text-[10px]">¥{item.totalNagquPrice.toLocaleString()}</td>
-                          <td className="px-6 py-3 text-right text-stone-600 font-medium">¥{item.totalChannelPrice.toLocaleString()}</td>
-                          <td className="px-6 py-3 text-right font-bold text-accent-600">¥{item.totalRetail.toLocaleString()}</td>
+                          <td className="px-4 py-3 font-bold text-brand-900">{item.specName}</td>
+                          <td className="px-4 py-3 text-stone-600">{item.rootsPerGram || '-'}</td>
+                          <td className="px-4 py-3 text-stone-600">
+                            <div className="flex flex-col text-xs">
+                                <span>{item.bottleType || '-'}</span>
+                                <span className="text-stone-400">{item.boxType || '-'}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-stone-600">
+                            {item.type === 'bottle' ? (
+                                <div className="flex flex-col text-xs">
+                                    <span>{item.rootsPerBottle}根/瓶</span>
+                                    <span className="text-stone-400">x{item.bottleCount}瓶</span>
+                                </div>
+                            ) : '-'}
+                          </td>
+                          <td className="px-4 py-3">
+                             {item.packagingColor ? (
+                                 <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 border border-stone-200 text-stone-600">
+                                     {item.packagingColor}
+                                 </span>
+                             ) : '-'}
+                          </td>
+                          <td className="px-4 py-3 text-stone-600 text-xs max-w-xs whitespace-normal">
+                             <div className="mb-1">{item.details}</div>
+                             {item.ecommerceSpec && (
+                                <div className="text-accent-600 text-[10px] border-t border-dashed border-stone-200 pt-1 mt-1">
+                                    {item.ecommerceSpec}
+                                </div>
+                             )}
+                          </td>
+                          <td className="px-4 py-3 text-right text-stone-400 text-[10px]">¥{item.totalNagquPrice.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right text-stone-600 font-medium">¥{item.totalChannelPrice.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right font-bold text-accent-600">¥{item.totalRetail.toLocaleString()}</td>
                         </tr>
                       ))}
                       <tr className="bg-stone-50">
-                        <td colSpan={2} className="px-6 py-3 text-right font-bold text-stone-900 text-sm">本次批次合计</td>
-                        <td className="px-6 py-3 text-right text-stone-400 text-xs">¥{batch.totalNagquPrice.toLocaleString()}</td>
-                        <td className="px-6 py-3 text-right text-stone-700 font-bold">¥{batch.totalChannelPrice.toLocaleString()}</td>
-                        <td className="px-6 py-3 text-right text-accent-600 font-black">¥{batch.totalRetail.toLocaleString()}</td>
+                        <td colSpan={6} className="px-4 py-3 text-right font-bold text-stone-900 text-sm">本次批次合计</td>
+                        <td className="px-4 py-3 text-right text-stone-400 text-xs">¥{batch.totalNagquPrice.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right text-stone-700 font-bold">¥{batch.totalChannelPrice.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right text-accent-600 font-black">¥{batch.totalRetail.toLocaleString()}</td>
                       </tr>
                     </tbody>
                   </table>
