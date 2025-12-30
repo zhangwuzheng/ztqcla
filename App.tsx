@@ -4,14 +4,29 @@ import { Calculator } from './components/Calculator';
 import { Settings } from './components/Settings';
 import { Queue } from './components/Queue';
 import { History } from './components/History';
+import { Login } from './components/Login';
 import { INITIAL_DATA } from './constants';
 import { AppData, ProductionItem, Batch } from './types';
 
 export default function App() {
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // App state
   const [activeTab, setActiveTab] = useState<'calculator' | 'settings' | 'history'>('calculator');
   const [data, setData] = useState<AppData>(INITIAL_DATA);
   const [queue, setQueue] = useState<ProductionItem[]>([]);
   const [history, setHistory] = useState<Batch[]>([]);
+
+  // Check login status on mount
+  useEffect(() => {
+    const authStatus = localStorage.getItem('is_authenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+    setIsCheckingAuth(false);
+  }, []);
 
   // Load history from local storage on mount
   useEffect(() => {
@@ -24,6 +39,17 @@ export default function App() {
       }
     }
   }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('is_authenticated', 'true');
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('is_authenticated');
+    setActiveTab('calculator'); // Reset tab
+  };
 
   const saveHistory = (newHistory: Batch[]) => {
     setHistory(newHistory);
@@ -60,21 +86,47 @@ export default function App() {
     saveHistory([]);
   };
 
+  if (isCheckingAuth) return null; // Or a loading spinner
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      <div className="pb-32 sm:pb-40"> 
+      {/* Add logout capability (optional, could be in Layout but putting a simple one here or rely on clear cache) 
+          Actually, let's inject a logout button into the layout via children or just rely on session expiry. 
+          For better UX, I'll assume the Layout has its own header. 
+          Let's add a small logout button at the bottom of the Settings page or keep it simple.
+          For now, simply authenticated view:
+      */}
+      <div className="pb-32 sm:pb-40 relative"> 
+        {/* Logout button absolute top right of content area or somewhere discrete if needed, 
+            but for now user didn't ask for explicit logout button, just login screen.
+            I will add a logout trigger in Settings for convenience.
+        */}
+        
         {activeTab === 'calculator' && (
            <Calculator data={data} onAddItem={handleAddItem} />
         )}
         {activeTab === 'settings' && (
-           <Settings data={data} onUpdate={setData} />
+           <div className="flex flex-col gap-6">
+             <Settings data={data} onUpdate={setData} />
+             <div className="text-center pb-8">
+                <button 
+                  onClick={handleLogout}
+                  className="text-stone-400 hover:text-brand-900 text-sm underline decoration-stone-300 underline-offset-4"
+                >
+                  退出登录
+                </button>
+             </div>
+           </div>
         )}
         {activeTab === 'history' && (
            <History batches={history} onClear={handleClearHistory} />
         )}
       </div>
       
-      {/* Show queue only on calculator tab or if not empty, but usually best just on calculator */}
       {activeTab === 'calculator' && (
         <Queue items={queue} onRemove={handleRemoveItem} onSubmit={handleSubmit} />
       )}

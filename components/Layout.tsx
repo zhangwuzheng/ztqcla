@@ -22,13 +22,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           <div className="flex justify-between h-16 items-center">
             {/* Logo Section */}
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => onTabChange('calculator')}>
-              <div className="relative w-10 h-10 flex items-center justify-center bg-brand-800 rounded-lg border border-brand-700 shadow-inner">
-                {/* Mountain Icon SVG */}
-                <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-accent-500" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 3L2 20H22L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M7.5 10.5L10 15L14.5 7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M14.5 15.5L16.5 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+              <div className="relative w-10 h-10 flex items-center justify-center bg-brand-800 rounded-lg border border-brand-700 shadow-inner overflow-hidden">
+                <img 
+                  src="https://img.lenyiin.com/app/hide.php?key=S0d4Y1N4YThGNkRHbnV4U1lrL1BBMDVncmc1Q1ZhZkZPR2c4dUg0PQ==" 
+                  alt="藏境扎塔奇 Logo" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <h1 className="text-lg font-bold tracking-wider text-stone-50 leading-tight">藏境扎塔奇</h1>
