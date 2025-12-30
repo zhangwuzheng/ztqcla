@@ -4,8 +4,9 @@ export interface ProductSpec {
   id: SpecId;
   name: string; // e.g., "900", "1400-1500"
   rootsPerJin: number; // Approximate numeric value for sorting/calc
-  rootsPerGram: number;
-  costPrice: number; // 那曲成本价
+  rootsPerGramMin: number;
+  rootsPerGramMax: number;
+  nagquPrice: number; // 那曲发货价
   channelPrice: number; // 藏境发货价
   minSalesPrice: number; // 最低销售限价
   retailPrice: number; // 建议零售价
@@ -16,7 +17,7 @@ export interface BottleRule {
   smallBottleCount: number; // Roots per small bottle
   mediumBottleCount: number; // Roots per medium bottle
   smallBottlesPerBox: number[]; // e.g., [8, 10]
-  mediumBottlesPerBox: number[]; // e.g., [5]
+  mediumBottlesPerBox: number[]; // e.g., [2, 3, 4, 5]
 }
 
 export interface ProductionItem {
@@ -25,7 +26,8 @@ export interface ProductionItem {
   type: 'bottle' | 'box';
   details: string; // e.g., "Small Bottle (5 roots) x 10 bottles"
   totalRoots: number;
-  totalCost: number;
+  totalNagquPrice: number;
+  totalChannelPrice: number;
   totalRetail: number;
   timestamp: number;
 }
@@ -34,7 +36,8 @@ export interface Batch {
   id: string;
   date: string;
   items: ProductionItem[];
-  totalCost: number;
+  totalNagquPrice: number;
+  totalChannelPrice: number;
   totalRetail: number;
   itemCount: number;
 }

@@ -17,6 +17,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
   
   // Box/Gram Mode State
   const [gramWeight, setGramWeight] = useState<number>(50);
+  const [customGram, setCustomGram] = useState<string>('');
 
   // Derived State
   const spec = data.specs.find(s => s.id === selectedSpecId);
@@ -35,10 +36,20 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
 
   if (!spec || !bottleRule) return <div className="p-8 text-center text-stone-500">正在加载数据...</div>;
 
+  const currentWeight = customGram ? parseFloat(customGram) || 0 : gramWeight;
+
+  // Formatting roots per gram
+  const rootsPerGramText = spec.rootsPerGramMin === spec.rootsPerGramMax 
+    ? `${spec.rootsPerGramMin}` 
+    : `${spec.rootsPerGramMin}-${spec.rootsPerGramMax}`;
+
+  const avgRootsPerGram = (spec.rootsPerGramMin + spec.rootsPerGramMax) / 2;
+
   // Calculation
   let calculated = {
     totalRoots: 0,
-    totalCost: 0,
+    totalNagquPrice: 0,
+    totalChannelPrice: 0,
     totalRetail: 0,
     description: ''
   };
@@ -49,20 +60,19 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
     const totalBottles = quantity * bottlesPerUnit;
     
     calculated.totalRoots = totalBottles * rootsPerBottle;
-    calculated.totalCost = calculated.totalRoots * spec.costPrice;
+    calculated.totalNagquPrice = calculated.totalRoots * spec.nagquPrice;
+    calculated.totalChannelPrice = calculated.totalRoots * spec.channelPrice;
     calculated.totalRetail = calculated.totalRoots * spec.retailPrice;
     
     const boxText = boxConfig > 1 ? `(共${quantity}盒, 每盒${boxConfig}瓶)` : `(${quantity}瓶散装)`;
-    // Updated description to explicitly include total roots
-    calculated.description = `规格:${spec.name} - ${bottleSize === 'small' ? '小瓶' : '中瓶'} (${rootsPerBottle}根/瓶) x ${totalBottles}瓶 ${boxText} [总根数:${calculated.totalRoots}]`;
+    calculated.description = `规格:${spec.name}(${rootsPerGramText}根/克) - ${bottleSize === 'small' ? '小瓶' : '中瓶'} (${rootsPerBottle}根/瓶) x ${totalBottles}瓶 ${boxText} [总根数:${calculated.totalRoots}]`;
   } else {
-    const totalGrams = gramWeight * quantity;
-    const rootsPerBox = Math.round(gramWeight * spec.rootsPerGram);
+    const rootsPerBox = Math.round(currentWeight * avgRootsPerGram);
     calculated.totalRoots = rootsPerBox * quantity;
-    calculated.totalCost = calculated.totalRoots * spec.costPrice;
+    calculated.totalNagquPrice = calculated.totalRoots * spec.nagquPrice;
+    calculated.totalChannelPrice = calculated.totalRoots * spec.channelPrice;
     calculated.totalRetail = calculated.totalRoots * spec.retailPrice;
-    // Updated description to explicitly include total roots
-    calculated.description = `规格:${spec.name} - ${gramWeight}克礼盒 (约${rootsPerBox}根) x ${quantity}盒 [总根数:${calculated.totalRoots}]`;
+    calculated.description = `规格:${spec.name}(${rootsPerGramText}根/克) - ${currentWeight}克礼盒 (约${rootsPerBox}根) x ${quantity}盒 [总根数:${calculated.totalRoots}]`;
   }
 
   const handleAdd = () => {
@@ -72,7 +82,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
       type: mode,
       details: calculated.description,
       totalRoots: calculated.totalRoots,
-      totalCost: calculated.totalCost,
+      totalNagquPrice: calculated.totalNagquPrice,
+      totalChannelPrice: calculated.totalChannelPrice,
       totalRetail: calculated.totalRetail,
       timestamp: Date.now(),
     });
@@ -100,6 +111,9 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
                 }`}
               >
                 <span className="font-medium text-base">{s.name}</span>
+                <span className={`text-[10px] ${selectedSpecId === s.id ? 'text-accent-400' : 'text-stone-400'}`}>
+                  {s.rootsPerGramMin === s.rootsPerGramMax ? s.rootsPerGramMin : `${s.rootsPerGramMin}-${s.rootsPerGramMax}`} 根/克
+                </span>
                 <span className={`text-xs mt-1 ${selectedSpecId === s.id ? 'text-accent-400' : 'text-stone-400'}`}>
                   ¥{s.retailPrice}/根
                 </span>
@@ -187,26 +201,48 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-stone-500 mb-2 uppercase tracking-wide">每盒克重</label>
-                  <div className="flex gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     {[50, 100].map(w => (
                       <button
                         key={w}
-                        onClick={() => setGramWeight(w)}
-                        className={`flex-1 p-4 border rounded-xl text-center font-bold transition-all ${
-                          gramWeight === w 
+                        onClick={() => {
+                          setGramWeight(w);
+                          setCustomGram('');
+                        }}
+                        className={`p-4 border rounded-xl text-center font-bold transition-all ${
+                          gramWeight === w && !customGram
                             ? 'border-accent-500 bg-accent-100/10 text-brand-900 ring-1 ring-accent-500' 
                             : 'border-stone-200 text-stone-600 hover:bg-stone-50'
                         }`}
                       >
-                        {w}g / 盒
+                        {w}g
                       </button>
                     ))}
+                    <div className="relative">
+                      <input 
+                        type="number"
+                        placeholder="自定义(g)"
+                        value={customGram}
+                        onChange={(e) => {
+                          setCustomGram(e.target.value);
+                          setGramWeight(0);
+                        }}
+                        className={`w-full h-full p-4 border rounded-xl text-center font-bold outline-none transition-all ${
+                          customGram 
+                            ? 'border-accent-500 bg-accent-100/10 text-brand-900 ring-1 ring-accent-500' 
+                            : 'border-stone-200 hover:border-stone-300'
+                        }`}
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="bg-brand-50 border border-brand-100 p-5 rounded-xl flex items-center justify-between">
-                   <span className="text-sm font-medium text-brand-700">预估包含根数</span>
+                   <div className="flex flex-col">
+                      <span className="text-sm font-medium text-brand-700">预估包含根数</span>
+                      <span className="text-[10px] text-stone-400">基于 {rootsPerGramText} 根/克 计算</span>
+                   </div>
                    <span className="text-2xl font-bold text-brand-900">
-                     ~{Math.round(gramWeight * spec.rootsPerGram)} <span className="text-sm font-normal text-stone-500">根</span>
+                     ~{Math.round(currentWeight * avgRootsPerGram)} <span className="text-sm font-normal text-stone-500">根</span>
                    </span>
                 </div>
               </div>
@@ -253,18 +289,22 @@ export const Calculator: React.FC<CalculatorProps> = ({ data, onAddItem }) => {
             <span className="text-xs font-medium bg-brand-800 text-accent-500 px-2 py-1 rounded border border-brand-700">{spec.name}</span>
           </div>
           
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-5">
             <div className="space-y-1">
               <p className="text-sm text-stone-400">总根数</p>
               <p className="text-4xl font-bold text-white tracking-tight">{calculated.totalRoots.toLocaleString()}</p>
             </div>
             
-            <div className="pt-6 border-t border-brand-800 space-y-4">
+            <div className="pt-5 border-t border-brand-800 space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-stone-400 text-sm">那曲成本 ({spec.costPrice})</span>
-                <span className="font-medium text-stone-200">¥{calculated.totalCost.toLocaleString()}</span>
+                <span className="text-stone-400 text-xs">那曲发货价 ({spec.nagquPrice})</span>
+                <span className="font-medium text-stone-200 text-sm">¥{calculated.totalNagquPrice.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between items-end">
+              <div className="flex justify-between items-center">
+                <span className="text-stone-400 text-xs">藏境发货价 ({spec.channelPrice})</span>
+                <span className="font-medium text-stone-200 text-sm">¥{calculated.totalChannelPrice.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-end pt-2">
                  <span className="text-accent-500 text-sm font-medium">建议零售总价</span>
                  <span className="text-2xl font-bold text-accent-500">¥{calculated.totalRetail.toLocaleString()}</span>
               </div>

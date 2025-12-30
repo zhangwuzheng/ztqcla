@@ -9,7 +9,8 @@ interface QueueProps {
 
 export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const totalCost = items.reduce((acc, item) => acc + item.totalCost, 0);
+  const totalNagqu = items.reduce((acc, item) => acc + item.totalNagquPrice, 0);
+  const totalChannel = items.reduce((acc, item) => acc + item.totalChannelPrice, 0);
   const totalRetail = items.reduce((acc, item) => acc + item.totalRetail, 0);
 
   if (items.length === 0) return null;
@@ -24,7 +25,7 @@ export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
               {items.length}
             </div>
             <div>
-              <div className="text-xs text-stone-500">总计</div>
+              <div className="text-[10px] text-stone-500 leading-none">总计</div>
               <div className="font-bold text-brand-900">¥{totalRetail.toLocaleString()}</div>
             </div>
             <svg className="w-5 h-5 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,7 +47,6 @@ export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-stone-50 border-b border-stone-200">
           <div className="flex items-center gap-4 cursor-pointer md:cursor-default" onClick={() => setIsExpanded(false)}>
-            {/* Mobile Close Icon */}
             <div className="md:hidden p-1 rounded-full hover:bg-stone-200">
                <svg className="w-6 h-6 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -60,13 +60,17 @@ export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
             </h3>
           </div>
           
-          <div className="flex items-center gap-4 sm:gap-8">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <div className="hidden lg:block text-right">
+              <span className="text-[10px] text-stone-500 block uppercase font-bold tracking-tight">那曲发货总额</span>
+              <span className="font-medium text-stone-600">¥{totalNagqu.toLocaleString()}</span>
+            </div>
             <div className="hidden sm:block text-right">
-              <span className="text-xs text-stone-500 block">那曲总成本</span>
-              <span className="font-medium text-stone-900">¥{totalCost.toLocaleString()}</span>
+              <span className="text-[10px] text-stone-500 block uppercase font-bold tracking-tight">藏境发货总额</span>
+              <span className="font-medium text-stone-700">¥{totalChannel.toLocaleString()}</span>
             </div>
             <div className="text-right">
-              <span className="text-xs text-stone-500 block">建议零售总价</span>
+              <span className="text-[10px] text-stone-500 block uppercase font-bold tracking-tight">建议零售总价</span>
               <span className="font-bold text-accent-600 text-lg">¥{totalRetail.toLocaleString()}</span>
             </div>
             <button
@@ -81,7 +85,6 @@ export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
         {/* Table/List */}
         <div className="overflow-y-auto flex-grow bg-white">
           <div className="md:hidden divide-y divide-stone-100">
-             {/* Mobile List View */}
              {items.map((item) => (
                 <div key={item.id} className="p-4 flex justify-between items-start">
                   <div className="flex-1">
@@ -108,9 +111,9 @@ export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
             <thead className="bg-stone-50 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-3 text-left font-medium text-stone-500 text-xs uppercase tracking-wider w-24">规格</th>
-                <th className="px-6 py-3 text-left font-medium text-stone-500 text-xs uppercase tracking-wider">详情描述</th>
-                <th className="px-6 py-3 text-right font-medium text-stone-500 text-xs uppercase tracking-wider w-32">总根数</th>
-                <th className="px-6 py-3 text-right font-medium text-stone-500 text-xs uppercase tracking-wider w-32">成本</th>
+                <th className="px-6 py-3 text-left font-medium text-stone-500 text-xs uppercase tracking-wider">详情描述 (含总根数)</th>
+                <th className="px-6 py-3 text-right font-medium text-stone-500 text-xs uppercase tracking-wider">那曲价</th>
+                <th className="px-6 py-3 text-right font-medium text-stone-500 text-xs uppercase tracking-wider">藏境价</th>
                 <th className="px-6 py-3 text-right font-medium text-stone-500 text-xs uppercase tracking-wider w-32">零售价</th>
                 <th className="px-6 py-3 text-center font-medium text-stone-500 text-xs uppercase tracking-wider w-16"></th>
               </tr>
@@ -120,8 +123,8 @@ export const Queue: React.FC<QueueProps> = ({ items, onRemove, onSubmit }) => {
                 <tr key={item.id} className="hover:bg-stone-50 transition-colors group">
                   <td className="px-6 py-4 font-bold text-brand-900">{item.specName}</td>
                   <td className="px-6 py-4 text-stone-600 text-sm">{item.details}</td>
-                  <td className="px-6 py-4 text-right text-stone-900 text-sm font-medium">{item.totalRoots.toLocaleString()}</td>
-                  <td className="px-6 py-4 text-right text-stone-500 text-sm">¥{item.totalCost.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-right text-stone-400 text-xs font-medium">¥{item.totalNagquPrice.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-right text-stone-600 text-sm">¥{item.totalChannelPrice.toLocaleString()}</td>
                   <td className="px-6 py-4 text-right font-bold text-accent-600">¥{item.totalRetail.toLocaleString()}</td>
                   <td className="px-6 py-4 text-center">
                     <button

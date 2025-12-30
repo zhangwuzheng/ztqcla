@@ -70,7 +70,8 @@ export default function App() {
         id: Date.now().toString(),
         date: new Date().toLocaleString('zh-CN'),
         items: [...queue],
-        totalCost: queue.reduce((acc, i) => acc + i.totalCost, 0),
+        totalNagquPrice: queue.reduce((acc, i) => acc + i.totalNagquPrice, 0),
+        totalChannelPrice: queue.reduce((acc, i) => acc + i.totalChannelPrice, 0),
         totalRetail: queue.reduce((acc, i) => acc + i.totalRetail, 0),
         itemCount: queue.length
       };
@@ -94,18 +95,7 @@ export default function App() {
 
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
-      {/* Add logout capability (optional, could be in Layout but putting a simple one here or rely on clear cache) 
-          Actually, let's inject a logout button into the layout via children or just rely on session expiry. 
-          For better UX, I'll assume the Layout has its own header. 
-          Let's add a small logout button at the bottom of the Settings page or keep it simple.
-          For now, simply authenticated view:
-      */}
       <div className="pb-32 sm:pb-40 relative"> 
-        {/* Logout button absolute top right of content area or somewhere discrete if needed, 
-            but for now user didn't ask for explicit logout button, just login screen.
-            I will add a logout trigger in Settings for convenience.
-        */}
-        
         {activeTab === 'calculator' && (
            <Calculator data={data} onAddItem={handleAddItem} />
         )}

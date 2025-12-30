@@ -31,10 +31,10 @@ export const Settings: React.FC<SettingsProps> = ({ data, onUpdate }) => {
             <thead className="bg-stone-50">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">规格名称</th>
-                <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">根数/克</th>
-                <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">那曲成本价</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">根数/克 (低-高)</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">那曲发货价</th>
                 <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">藏境发货价</th>
-                <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">最低销售限价</th>
+                <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider text-[10px] leading-tight">最低销售限价<br/>(不低于零售8折)</th>
                 <th className="px-4 py-3 text-left font-medium text-stone-500 uppercase tracking-wider">建议零售价</th>
               </tr>
             </thead>
@@ -45,20 +45,30 @@ export const Settings: React.FC<SettingsProps> = ({ data, onUpdate }) => {
                   <tr key={spec.id} className="hover:bg-stone-50 group">
                     <td className="px-4 py-3 font-bold text-brand-900">{spec.name}</td>
                     <td className="px-4 py-3">
-                      <input
-                        type="number"
-                        step="0.1"
-                        className="w-20 border-stone-300 rounded-md shadow-sm focus:border-accent-500 focus:ring-accent-500 text-sm py-1"
-                        value={spec.rootsPerGram}
-                        onChange={(e) => handleSpecChange(idx, 'rootsPerGram', parseFloat(e.target.value))}
-                      />
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          step="0.1"
+                          className="w-14 border-stone-300 rounded-md shadow-sm focus:border-accent-500 focus:ring-accent-500 text-xs py-1"
+                          value={spec.rootsPerGramMin}
+                          onChange={(e) => handleSpecChange(idx, 'rootsPerGramMin', parseFloat(e.target.value))}
+                        />
+                        <span className="text-stone-400">-</span>
+                        <input
+                          type="number"
+                          step="0.1"
+                          className="w-14 border-stone-300 rounded-md shadow-sm focus:border-accent-500 focus:ring-accent-500 text-xs py-1"
+                          value={spec.rootsPerGramMax}
+                          onChange={(e) => handleSpecChange(idx, 'rootsPerGramMax', parseFloat(e.target.value))}
+                        />
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <input
                         type="number"
                         className="w-24 border-stone-300 rounded-md shadow-sm focus:border-accent-500 focus:ring-accent-500 text-sm py-1"
-                        value={spec.costPrice}
-                        onChange={(e) => handleSpecChange(idx, 'costPrice', parseFloat(e.target.value))}
+                        value={spec.nagquPrice}
+                        onChange={(e) => handleSpecChange(idx, 'nagquPrice', parseFloat(e.target.value))}
                       />
                     </td>
                     <td className="px-4 py-3">
