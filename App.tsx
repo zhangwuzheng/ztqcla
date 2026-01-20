@@ -40,6 +40,29 @@ export default function App() {
     }
   }, []);
 
+  // Load configuration from server (config.json) on mount
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        // Add timestamp to prevent caching
+        const response = await fetch(`./config.json?t=${Date.now()}`);
+        if (response.ok) {
+          const serverConfig = await response.json();
+          // Simple validation to ensure it has correct structure
+          if (serverConfig.specs && Array.isArray(serverConfig.specs) && serverConfig.bottleRules) {
+            setData(serverConfig);
+            console.log('Configuration loaded from server.');
+          }
+        } else {
+          console.warn('config.json not found, using default data.');
+        }
+      } catch (error) {
+        console.warn('Failed to load config.json, using default data.', error);
+      }
+    };
+    loadConfig();
+  }, []);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
     localStorage.setItem('is_authenticated', 'true');

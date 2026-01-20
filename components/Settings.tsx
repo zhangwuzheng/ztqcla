@@ -20,8 +20,34 @@ export const Settings: React.FC<SettingsProps> = ({ data, onUpdate }) => {
     onUpdate({ ...data, bottleRules: newRules });
   };
 
+  const handleExportConfig = () => {
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'config.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-8 pb-12 animate-fadeIn">
+      <div className="flex justify-between items-center">
+         <h2 className="text-xl font-bold text-brand-900">数据与规则配置</h2>
+         <button
+           onClick={handleExportConfig}
+           className="flex items-center gap-2 bg-brand-900 text-stone-100 px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-brand-800 transition-colors"
+           title="下载当前配置为JSON文件，上传至服务器根目录即可更新全站默认配置"
+         >
+           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+           </svg>
+           导出配置文件 (config.json)
+         </button>
+      </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
         <div className="px-6 py-5 border-b border-stone-200 bg-stone-50 flex justify-between items-center">
           <h2 className="text-lg font-bold text-brand-900">基础价格与规格数据</h2>
